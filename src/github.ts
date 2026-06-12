@@ -1,5 +1,6 @@
 import type { BranchRef } from './parse-branch'
 import type { IssueRef } from './parse-issue'
+import type { PrRef } from './parse-pr'
 
 export type BranchStatus = 'active' | 'stale' | 'deleted'
 
@@ -66,6 +67,34 @@ const prStateOf = (pr: {
   if (pr.state === 'closed') return 'closed'
   if (pr.draft) return 'draft'
   return 'open'
+}
+
+// Look up the current state of a single pull request.
+export const fetchPrResult = async (
+  ref: PrRef,
+  token?: string,
+): Promise<PrInfo> => {
+  const { owner, repo, number } = ref
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/pulls/${number}`,
+    { headers: apiHeaders(token) },
+  )
+  if (!res.ok) throw errorFor(res, 'pull request')
+
+  const data = (await res.json()) as {
+    number: number
+    state: string
+    draft?: boolean
+    merged_at?: string | null
+    html_url: string
+    title: string
+  }
+  return {
+    number: data.number,
+    state: prStateOf(data),
+    url: data.html_url,
+    title: data.title,
+  }
 }
 
 // An issue is `open`, closed as `completed`, or closed as `not_planned`.
