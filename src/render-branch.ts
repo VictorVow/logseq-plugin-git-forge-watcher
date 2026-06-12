@@ -1,4 +1,10 @@
-import { cacheKey, dedupe, getCached, setCached } from './cache'
+import {
+  cacheKey,
+  dedupe,
+  getCached,
+  getCachedStale,
+  setCached,
+} from './cache'
 import {
   type BranchResult,
   type BranchStatus,
@@ -90,10 +96,12 @@ const escapeHtml = (s: string): string =>
       })[c] as string,
   )
 
-const shell = (inner: string): string => `
-  <span class="gfw-branch-widget"
+// `stale` dims the widget and explains it via a tooltip — used when we're
+// showing a cached value because a refetch failed (e.g. offline).
+const shell = (inner: string, stale = false): string => `
+  <span class="gfw-branch-widget"${stale ? ' title="Offline — showing last known state"' : ''}
         style="display:inline-flex;align-items:center;gap:6px;
-               margin-right:6px;vertical-align:middle;">
+               margin-right:6px;vertical-align:middle;${stale ? 'opacity:0.55;' : ''}">
     ${inner}
   </span>`
 
@@ -136,7 +144,7 @@ export const handleRender = async (
     return
   }
 
-  const draw = (result: BranchResult) => {
+  const draw = (result: BranchResult, stale = false) => {
     const pills = result.prs
       .slice()
       .sort((a, b) => b.number - a.number)
@@ -150,6 +158,7 @@ export const handleRender = async (
         branchButton(result.status, slot, encodedUrl) +
           openLink(ref.url) +
           pills,
+        stale,
       ),
     })
   }
@@ -183,7 +192,13 @@ export const handleRender = async (
     setCached(ck, result)
     draw(result)
   } catch (err) {
-    console.error('[git-forge-watcher] render failed', err)
+    console.error('[github-watcher] render failed', err)
+    // Prefer the last known state over an error when we have one cached.
+    const stale = getCachedStale<BranchResult>(ck)
+    if (stale) {
+      draw(stale, true)
+      return
+    }
     const rateLimited = err instanceof GitHubError && err.rateLimited
     const hint = rateLimited
       ? logseq.settings?.githubToken

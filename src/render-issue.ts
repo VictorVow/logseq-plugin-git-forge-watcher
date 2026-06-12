@@ -1,4 +1,10 @@
-import { cacheKey, dedupe, getCached, setCached } from './cache'
+import {
+  cacheKey,
+  dedupe,
+  getCached,
+  getCachedStale,
+  setCached,
+} from './cache'
 import {
   GitHubError,
   type IssueResult,
@@ -60,10 +66,12 @@ const openLink = (url: string): string => `
     ${linkExternalIconSvg('currentColor')}
   </a>`
 
-const shell = (inner: string): string => `
-  <span class="gfw-issue-widget"
+// `stale` dims the widget and explains it via a tooltip — used when we're
+// showing a cached value because a refetch failed (e.g. offline).
+const shell = (inner: string, stale = false): string => `
+  <span class="gfw-issue-widget"${stale ? ' title="Offline — showing last known state"' : ''}
         style="display:inline-flex;align-items:center;gap:6px;
-               margin-right:6px;vertical-align:middle;">
+               margin-right:6px;vertical-align:middle;${stale ? 'opacity:0.55;' : ''}">
     ${inner}
   </span>`
 
@@ -106,13 +114,14 @@ export const handleRender = async (
     return
   }
 
-  const draw = (result: IssueResult) => {
+  const draw = (result: IssueResult, stale = false) => {
     logseq.provideUI({
       key,
       slot,
       reset: true,
       template: shell(
         issueButton(result.state, slot, encodedUrl) + openLink(result.url),
+        stale,
       ),
     })
   }
@@ -143,7 +152,13 @@ export const handleRender = async (
     setCached(ck, result)
     draw(result)
   } catch (err) {
-    console.error('[git-forge-watcher] issue render failed', err)
+    console.error('[github-watcher] issue render failed', err)
+    // Prefer the last known state over an error when we have one cached.
+    const stale = getCachedStale<IssueResult>(ck)
+    if (stale) {
+      draw(stale, true)
+      return
+    }
     const rateLimited = err instanceof GitHubError && err.rateLimited
     const hint = rateLimited
       ? logseq.settings?.githubToken

@@ -34,6 +34,19 @@ export const getCached = <T>(key: string, ttlMs: number): T | null => {
   }
 }
 
+// Return a cached value regardless of its age. Used as an offline fallback:
+// when a refetch fails we'd still rather show the last known state than an
+// error. Returns null only if nothing was ever cached (or it can't be parsed).
+export const getCachedStale = <T>(key: string): T | null => {
+  try {
+    const raw = localStorage.getItem(PREFIX + key)
+    if (!raw) return null
+    return (JSON.parse(raw) as CacheEntry<T>).result
+  } catch {
+    return null
+  }
+}
+
 export const setCached = <T>(key: string, result: T): void => {
   try {
     const entry: CacheEntry<T> = { result, fetchedAt: Date.now() }
