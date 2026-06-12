@@ -1,11 +1,11 @@
 {
-  "name": "<insert-plugin-name>",
+  "name": "logseq-plugin-git-forge-watcher",
   "author": "benjypng",
-  "description": "",
+  "description": "Watch GitHub branches and their linked pull requests inline in your Logseq blocks.",
   "license": "MIT",
   "logseq": {
-    "id": "<insert-plugin-name>",
-    "title": "<insert-plugin-name>",
+    "id": "logseq-plugin-git-forge-watcher",
+    "title": "Git Forge Watcher",
     "icon": "./icon.svg",
     "main": "dist/index.html"
   },
@@ -24,7 +24,7 @@
         "@semantic-release/github",
         {
           "assets": [
-            "<insert-plugin-name>.zip"
+            "logseq-plugin-git-forge-watcher.zip"
           ]
         }
       ]
