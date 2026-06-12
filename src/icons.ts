@@ -21,6 +21,13 @@ export const mergedIconSvg = (color: string, size = 14): string => `
   <path d="M5.45 5.154A4.25 4.25 0 0 0 9.25 7.5h1.378a2.251 2.251 0 1 1 0 1.5H9.25A5.734 5.734 0 0 1 5 7.123v3.505a2.25 2.25 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.95-.218ZM4.25 13.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm8.5-4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
 </svg>`
 
+// Star: "star-fill" glyph — the repo stargazer count affordance.
+export const starIconSvg = (color: string, size = 14): string => `
+<svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"
+     style="fill:${color};vertical-align:text-bottom;">
+  <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"></path>
+</svg>`
+
 // External link: "link-external" glyph — the "open on GitHub" affordance.
 export const linkExternalIconSvg = (color: string, size = 12): string => `
 <svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"

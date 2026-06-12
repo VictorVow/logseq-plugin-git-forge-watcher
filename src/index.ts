@@ -16,11 +16,17 @@ import {
   RENDERER_KEY as PR_RENDERER_KEY,
   registerPrRenderModel,
 } from './render-pr'
+import {
+  handleRender as handleRepoRender,
+  RENDERER_KEY as REPO_RENDERER_KEY,
+  registerRepoRenderModel,
+} from './render-repo'
 import { settings } from './settings'
 import {
   registerBranchSlashCommand,
   registerIssueSlashCommand,
   registerPrSlashCommand,
+  registerRepoSlashCommand,
 } from './slash'
 
 const main = async () => {
@@ -30,15 +36,18 @@ const main = async () => {
   // Used to handle any popups
   handlePopup()
 
-  // Slash commands: "Git Forge Watcher - Branch" / "… - Issue" / "… - Pull Request"
+  // Slash commands: "Git Forge Watcher - Branch" / "… - Issue" /
+  // "… - Pull Request" / "… - Repo"
   registerBranchSlashCommand()
   registerIssueSlashCommand()
   registerPrSlashCommand()
+  registerRepoSlashCommand()
 
   // Click handlers backing the button force-refresh on each widget.
   registerBranchRenderModel()
   registerIssueRenderModel()
   registerPrRenderModel()
+  registerRepoRenderModel()
 
   // Renderers that draw the inline widgets inside the block.
   logseq.App.onMacroRendererSlotted(async ({ slot, payload }) => {
@@ -50,6 +59,8 @@ const main = async () => {
       await handleIssueRender(slot, (encodedUrl ?? '').trim())
     } else if (key === PR_RENDERER_KEY) {
       await handlePrRender(slot, (encodedUrl ?? '').trim())
+    } else if (key === REPO_RENDERER_KEY) {
+      await handleRepoRender(slot, (encodedUrl ?? '').trim())
     }
   })
 }
