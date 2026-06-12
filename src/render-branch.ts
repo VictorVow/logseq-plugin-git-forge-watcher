@@ -1,4 +1,6 @@
+import { cacheKey, dedupe, getCached, setCached } from './cache'
 import {
+  type BranchResult,
   type BranchStatus,
   fetchBranchResult,
   type PrInfo,
@@ -7,6 +9,7 @@ import {
 import {
   branchIconSvg,
   closedIconSvg,
+  linkExternalIconSvg,
   mergedIconSvg,
   pullRequestIconSvg,
 } from './icons'
@@ -44,19 +47,34 @@ const pill = (pr: PrInfo): string => `
     ${prIcon(pr.state)}<span>#${pr.number}</span>
   </a>`
 
-const branchButton = (status: BranchStatus, url: string): string => {
+// The branch icon is a button that force-refreshes the cache on click. The
+// slot + encoded url ride along in data attributes so the click model can
+// re-render this exact widget.
+const branchButton = (
+  status: BranchStatus,
+  slot: string,
+  encodedUrl: string,
+): string => {
   const color = BRANCH_COLORS[status]
   return `
-  <a class="gfw-branch-btn" href="${url}" target="_blank" rel="noopener"
-     title="Branch ${status}"
-     style="display:inline-flex;align-items:center;justify-content:center;
-            width:22px;height:22px;border-radius:6px;
-            border:1px solid var(--ls-border-color, #30363d);
-            background:var(--ls-secondary-background-color, transparent);
-            text-decoration:none;">
+  <span class="gfw-branch-btn" data-on-click="gfwRefreshBranch"
+        data-slot="${slot}" data-url="${encodedUrl}"
+        title="Branch ${status} — click to refresh"
+        style="display:inline-flex;align-items:center;justify-content:center;
+               width:22px;height:22px;border-radius:6px;cursor:pointer;
+               border:1px solid var(--ls-border-color, #30363d);
+               background:var(--ls-secondary-background-color, transparent);">
     ${branchIconSvg(color)}
-  </a>`
+  </span>`
 }
+
+const openLink = (url: string): string => `
+  <a class="gfw-open" href="${url}" target="_blank" rel="noopener"
+     title="Open branch on GitHub"
+     style="display:inline-flex;align-items:center;text-decoration:none;
+            color:var(--ls-secondary-text-color, #848d97);">
+    ${linkExternalIconSvg('currentColor')}
+  </a>`
 
 const escapeHtml = (s: string): string =>
   s.replace(
@@ -78,9 +96,23 @@ const shell = (inner: string): string => `
     ${inner}
   </span>`
 
+const ttlMs = (): number =>
+  (Number(logseq.settings?.cacheTtlHours ?? 24) || 24) * 60 * 60 * 1000
+
+// Register the click handler that backs the branch button's force-refresh.
+export const registerBranchRenderModel = (): void => {
+  logseq.provideModel({
+    async gfwRefreshBranch(e: { dataset: { slot?: string; url?: string } }) {
+      const { slot, url } = e.dataset
+      if (slot && url) await handleRender(slot, url, true)
+    },
+  })
+}
+
 export const handleRender = async (
   slot: string,
   encodedUrl: string,
+  force = false,
 ): Promise<void> => {
   const key = `gfw-branch-${slot}`
   let url: string
@@ -103,30 +135,52 @@ export const handleRender = async (
     return
   }
 
-  // Render a loading state immediately so the slot is never empty.
+  const draw = (result: BranchResult) => {
+    const pills = result.prs
+      .slice()
+      .sort((a, b) => b.number - a.number)
+      .map(pill)
+      .join('')
+    logseq.provideUI({
+      key,
+      slot,
+      reset: true,
+      template: shell(
+        branchButton(result.status, slot, encodedUrl) +
+          openLink(ref.url) +
+          pills,
+      ),
+    })
+  }
+
+  // Serve from cache unless this is a forced refresh.
+  const ck = cacheKey(ref.owner, ref.repo, ref.branch)
+  if (!force) {
+    const cached = getCached(ck, ttlMs())
+    if (cached) {
+      draw(cached)
+      return
+    }
+  }
+
+  // Cache miss (or forced) — show a neutral loading state, then fetch.
   logseq.provideUI({
     key,
     slot,
     reset: true,
-    template: shell(branchButton('stale', ref.url)),
+    template: shell(
+      branchButton('stale', slot, encodedUrl) + openLink(ref.url),
+    ),
   })
 
   try {
     const staleDays = Number(logseq.settings?.staleDays ?? 30) || 30
     const token = (logseq.settings?.githubToken as string) || undefined
-    const result = await fetchBranchResult(ref, staleDays, token)
-
-    const pills = result.prs
-      .sort((a, b) => b.number - a.number)
-      .map(pill)
-      .join('')
-
-    logseq.provideUI({
-      key,
-      slot,
-      reset: true,
-      template: shell(branchButton(result.status, ref.url) + pills),
-    })
+    const result = await dedupe(ck, () =>
+      fetchBranchResult(ref, staleDays, token),
+    )
+    setCached(ck, result)
+    draw(result)
   } catch (err) {
     console.error('[git-forge-watcher] render failed', err)
     logseq.provideUI({
@@ -134,7 +188,8 @@ export const handleRender = async (
       slot,
       reset: true,
       template: shell(
-        branchButton('deleted', ref.url) +
+        branchButton('deleted', slot, encodedUrl) +
+          openLink(ref.url) +
           `<span style="color:#848d97;font-size:11px;">API error</span>`,
       ),
     })

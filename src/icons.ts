@@ -21,6 +21,13 @@ export const mergedIconSvg = (color: string, size = 14): string => `
   <path d="M5.45 5.154A4.25 4.25 0 0 0 9.25 7.5h1.378a2.251 2.251 0 1 1 0 1.5H9.25A5.734 5.734 0 0 1 5 7.123v3.505a2.25 2.25 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.95-.218ZM4.25 13.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm8.5-4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
 </svg>`
 
+// External link: "link-external" glyph — the "open on GitHub" affordance.
+export const linkExternalIconSvg = (color: string, size = 12): string => `
+<svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"
+     style="fill:${color};vertical-align:text-bottom;">
+  <path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"></path>
+</svg>`
+
 // Closed (not merged) pull request: "git-pull-request-closed" glyph.
 export const closedIconSvg = (color: string, size = 14): string => `
 <svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"

@@ -1,7 +1,11 @@
 import '@logseq/libs'
 
 import { handlePopup } from './handle-popup'
-import { handleRender, RENDERER_KEY } from './render-branch'
+import {
+  handleRender,
+  RENDERER_KEY,
+  registerBranchRenderModel,
+} from './render-branch'
 import { settings } from './settings'
 import { registerBranchSlashCommand } from './slash'
 
@@ -14,6 +18,9 @@ const main = async () => {
 
   // Slash command: "Git Forge Watcher - Branch"
   registerBranchSlashCommand()
+
+  // Click handler backing the branch button's force-refresh.
+  registerBranchRenderModel()
 
   // Renderer that draws the branch button + PR pills inside the block.
   logseq.App.onMacroRendererSlotted(async ({ slot, payload }) => {

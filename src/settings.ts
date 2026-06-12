@@ -17,4 +17,12 @@ export const settings: SettingSchemaDesc[] = [
     description:
       'A branch whose last commit is older than this many days is shown in yellow (stale) instead of green (active).',
   },
+  {
+    key: 'cacheTtlHours',
+    type: 'number',
+    default: 24,
+    title: 'Cache TTL (hours)',
+    description:
+      'How long branch/PR status is cached before re-querying GitHub. Click a branch icon to force an immediate refresh.',
+  },
 ]
