@@ -5,14 +5,14 @@ import { RENDERER_KEY } from './render-branch'
 import { RENDERER_KEY as ISSUE_RENDERER_KEY } from './render-issue'
 import { RENDERER_KEY as PR_RENDERER_KEY } from './render-pr'
 
-// Registers the "GitHub Watcher - Branch" slash command. When run on a
+// Registers the "Git Forge Watcher - Branch" slash command. When run on a
 // block, it parses the GitHub branch link out of the block, then prepends a
 // renderer macro so the widget renders inline between the bullet and the title.
 //
 // DB graphs keep the editable text in `block.title`; file graphs use
 // `block.content`. Read/write the right one so this works on both.
 export const registerBranchSlashCommand = (): void => {
-  logseq.Editor.registerSlashCommand('GitHub Watcher - Branch', async () => {
+  logseq.Editor.registerSlashCommand('Git Forge Watcher - Branch', async () => {
     const block = await logseq.Editor.getCurrentBlock()
     if (!block) return
 
@@ -35,11 +35,11 @@ export const registerBranchSlashCommand = (): void => {
   })
 }
 
-// Registers the "GitHub Watcher - Issue" slash command. Same flow as the
+// Registers the "Git Forge Watcher - Issue" slash command. Same flow as the
 // branch command, but parses a GitHub issue link and prepends the issue
 // renderer macro so the state icon renders inline in front of the title.
 export const registerIssueSlashCommand = (): void => {
-  logseq.Editor.registerSlashCommand('GitHub Watcher - Issue', async () => {
+  logseq.Editor.registerSlashCommand('Git Forge Watcher - Issue', async () => {
     const block = await logseq.Editor.getCurrentBlock()
     if (!block) return
 
@@ -62,12 +62,12 @@ export const registerIssueSlashCommand = (): void => {
   })
 }
 
-// Registers the "GitHub Watcher - Pull Request" slash command. Same flow as
+// Registers the "Git Forge Watcher - Pull Request" slash command. Same flow as
 // the branch/issue commands, but parses a GitHub pull request link and prepends
 // the PR renderer macro so the state icon renders inline in front of the title.
 export const registerPrSlashCommand = (): void => {
   logseq.Editor.registerSlashCommand(
-    'GitHub Watcher - Pull Request',
+    'Git Forge Watcher - Pull Request',
     async () => {
       const block = await logseq.Editor.getCurrentBlock()
       if (!block) return
