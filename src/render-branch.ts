@@ -3,6 +3,7 @@ import {
   type BranchResult,
   type BranchStatus,
   fetchBranchResult,
+  GitHubError,
   type PrInfo,
   type PrState,
 } from './github'
@@ -183,14 +184,20 @@ export const handleRender = async (
     draw(result)
   } catch (err) {
     console.error('[git-forge-watcher] render failed', err)
+    const rateLimited = err instanceof GitHubError && err.rateLimited
+    const hint = rateLimited
+      ? logseq.settings?.githubToken
+        ? 'rate limited'
+        : 'rate limited — add a GitHub token in settings'
+      : 'API error'
     logseq.provideUI({
       key,
       slot,
       reset: true,
       template: shell(
-        branchButton('deleted', slot, encodedUrl) +
+        branchButton('stale', slot, encodedUrl) +
           openLink(ref.url) +
-          `<span style="color:#848d97;font-size:11px;">API error</span>`,
+          `<span style="color:#848d97;font-size:11px;">${hint}</span>`,
       ),
     })
   }

@@ -18,6 +18,35 @@ export interface BranchResult {
   lastCommit?: string
 }
 
+// Thrown when GitHub returns a non-OK response we can't treat as "missing".
+// `rateLimited` flags the unauthenticated-limit / abuse case (HTTP 403/429
+// with no remaining quota) so the UI can prompt for a token.
+export class GitHubError extends Error {
+  status: number
+  rateLimited: boolean
+  constructor(status: number, rateLimited: boolean, message: string) {
+    super(message)
+    this.name = 'GitHubError'
+    this.status = status
+    this.rateLimited = rateLimited
+  }
+}
+
+const isRateLimited = (res: Response): boolean =>
+  (res.status === 403 || res.status === 429) &&
+  res.headers.get('x-ratelimit-remaining') === '0'
+
+const errorFor = (res: Response, what: string): GitHubError => {
+  const limited = isRateLimited(res)
+  return new GitHubError(
+    res.status,
+    limited,
+    limited
+      ? `GitHub rate limit exceeded while fetching ${what}`
+      : `GitHub ${what} request failed: ${res.status}`,
+  )
+}
+
 const apiHeaders = (token?: string): HeadersInit => {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
@@ -64,7 +93,7 @@ export const fetchBranchResult = async (
     const staleMs = staleDays * 24 * 60 * 60 * 1000
     status = lastCommit && ageMs > staleMs ? 'stale' : 'active'
   } else if (branchRes.status !== 404) {
-    throw new Error(`GitHub branch lookup failed: ${branchRes.status}`)
+    throw errorFor(branchRes, 'branch')
   }
 
   // 2. Pull requests originating from this branch (any state).
@@ -72,23 +101,24 @@ export const fetchBranchResult = async (
     `${base}/pulls?head=${encodeURIComponent(`${owner}:${branch}`)}&state=all&per_page=100`,
     { headers },
   )
-  let prs: PrInfo[] = []
-  if (prRes.ok) {
-    const list = (await prRes.json()) as Array<{
-      number: number
-      state: string
-      draft?: boolean
-      merged_at?: string | null
-      html_url: string
-      title: string
-    }>
-    prs = list.map((pr) => ({
-      number: pr.number,
-      state: prStateOf(pr),
-      url: pr.html_url,
-      title: pr.title,
-    }))
-  }
+  // A failed PR lookup must throw rather than silently yield an empty list —
+  // otherwise a transient rate limit gets cached as "no PRs".
+  if (!prRes.ok) throw errorFor(prRes, 'pull requests')
+
+  const list = (await prRes.json()) as Array<{
+    number: number
+    state: string
+    draft?: boolean
+    merged_at?: string | null
+    html_url: string
+    title: string
+  }>
+  const prs: PrInfo[] = list.map((pr) => ({
+    number: pr.number,
+    state: prStateOf(pr),
+    url: pr.html_url,
+    title: pr.title,
+  }))
 
   return { status, prs, lastCommit }
 }
