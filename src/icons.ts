@@ -28,6 +28,29 @@ export const linkExternalIconSvg = (color: string, size = 12): string => `
   <path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"></path>
 </svg>`
 
+// Open issue: "issue-opened" glyph (green in GitHub's UI).
+export const issueOpenedIconSvg = (color: string, size = 14): string => `
+<svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"
+     style="fill:${color};vertical-align:text-bottom;">
+  <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path>
+  <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"></path>
+</svg>`
+
+// Closed-as-completed issue: "issue-closed" glyph (purple in GitHub's UI).
+export const issueClosedIconSvg = (color: string, size = 14): string => `
+<svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"
+     style="fill:${color};vertical-align:text-bottom;">
+  <path d="M11.28 6.78a.75.75 0 0 0-1.06-1.06L7.25 8.69 5.78 7.22a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l3.5-3.5Z"></path>
+  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0Zm-1.5 0a6.5 6.5 0 1 0-13 0 6.5 6.5 0 0 0 13 0Z"></path>
+</svg>`
+
+// Closed-as-not-planned issue: "skip" glyph, a circle-slash (grey in GitHub's UI).
+export const issueSkipIconSvg = (color: string, size = 14): string => `
+<svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"
+     style="fill:${color};vertical-align:text-bottom;">
+  <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM1.5 8a6.474 6.474 0 0 1 1.318-3.92l9.102 9.102A6.5 6.5 0 0 1 1.5 8Zm11.182 3.92L3.58 2.818a6.5 6.5 0 0 1 9.102 9.102Z"></path>
+</svg>`
+
 // Closed (not merged) pull request: "git-pull-request-closed" glyph.
 export const closedIconSvg = (color: string, size = 14): string => `
 <svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"

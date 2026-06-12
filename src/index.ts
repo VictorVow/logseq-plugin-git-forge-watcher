@@ -6,8 +6,13 @@ import {
   RENDERER_KEY,
   registerBranchRenderModel,
 } from './render-branch'
+import {
+  handleRender as handleIssueRender,
+  RENDERER_KEY as ISSUE_RENDERER_KEY,
+  registerIssueRenderModel,
+} from './render-issue'
 import { settings } from './settings'
-import { registerBranchSlashCommand } from './slash'
+import { registerBranchSlashCommand, registerIssueSlashCommand } from './slash'
 
 const main = async () => {
   const isDbGraph = await logseq.App.checkCurrentIsDbGraph()
@@ -16,17 +21,23 @@ const main = async () => {
   // Used to handle any popups
   handlePopup()
 
-  // Slash command: "Git Forge Watcher - Branch"
+  // Slash commands: "Git Forge Watcher - Branch" / "… - Issue"
   registerBranchSlashCommand()
+  registerIssueSlashCommand()
 
-  // Click handler backing the branch button's force-refresh.
+  // Click handlers backing the button force-refresh on each widget.
   registerBranchRenderModel()
+  registerIssueRenderModel()
 
-  // Renderer that draws the branch button + PR pills inside the block.
+  // Renderers that draw the inline widgets inside the block.
   logseq.App.onMacroRendererSlotted(async ({ slot, payload }) => {
     const [name, encodedUrl] = payload.arguments
-    if (name?.trim() !== RENDERER_KEY) return
-    await handleRender(slot, (encodedUrl ?? '').trim())
+    const key = name?.trim()
+    if (key === RENDERER_KEY) {
+      await handleRender(slot, (encodedUrl ?? '').trim())
+    } else if (key === ISSUE_RENDERER_KEY) {
+      await handleIssueRender(slot, (encodedUrl ?? '').trim())
+    }
   })
 }
 

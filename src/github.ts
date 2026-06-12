@@ -1,4 +1,5 @@
 import type { BranchRef } from './parse-branch'
+import type { IssueRef } from './parse-issue'
 
 export type BranchStatus = 'active' | 'stale' | 'deleted'
 
@@ -65,6 +66,51 @@ const prStateOf = (pr: {
   if (pr.state === 'closed') return 'closed'
   if (pr.draft) return 'draft'
   return 'open'
+}
+
+// An issue is `open`, closed as `completed`, or closed as `not_planned`.
+export type IssueState = 'open' | 'completed' | 'not_planned'
+
+export interface IssueResult {
+  state: IssueState
+  title: string
+  url: string
+  number: number
+}
+
+const issueStateOf = (issue: {
+  state: string
+  state_reason?: string | null
+}): IssueState => {
+  if (issue.state === 'open') return 'open'
+  return issue.state_reason === 'not_planned' ? 'not_planned' : 'completed'
+}
+
+// Look up the current state of a single issue.
+export const fetchIssueResult = async (
+  ref: IssueRef,
+  token?: string,
+): Promise<IssueResult> => {
+  const { owner, repo, number } = ref
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/issues/${number}`,
+    { headers: apiHeaders(token) },
+  )
+  if (!res.ok) throw errorFor(res, 'issue')
+
+  const data = (await res.json()) as {
+    state: string
+    state_reason?: string | null
+    html_url: string
+    title: string
+    number: number
+  }
+  return {
+    state: issueStateOf(data),
+    title: data.title,
+    url: data.html_url,
+    number: data.number,
+  }
 }
 
 // Look up branch status and any pull requests whose head is this branch.

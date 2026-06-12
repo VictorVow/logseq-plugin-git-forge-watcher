@@ -1,5 +1,7 @@
 import { parseBranchRef } from './parse-branch'
+import { parseIssueRef } from './parse-issue'
 import { RENDERER_KEY } from './render-branch'
+import { RENDERER_KEY as ISSUE_RENDERER_KEY } from './render-issue'
 
 // Registers the "Git Forge Watcher - Branch" slash command. When run on a
 // block, it parses the GitHub branch link out of the block, then prepends a
@@ -27,6 +29,33 @@ export const registerBranchSlashCommand = (): void => {
     }
 
     const macro = `{{renderer ${RENDERER_KEY}, ${encodeURIComponent(ref.url)}}}`
+    await logseq.Editor.updateBlock(block.uuid, `${macro} ${text}`)
+  })
+}
+
+// Registers the "Git Forge Watcher - Issue" slash command. Same flow as the
+// branch command, but parses a GitHub issue link and prepends the issue
+// renderer macro so the state icon renders inline in front of the title.
+export const registerIssueSlashCommand = (): void => {
+  logseq.Editor.registerSlashCommand('Git Forge Watcher - Issue', async () => {
+    const block = await logseq.Editor.getCurrentBlock()
+    if (!block) return
+
+    const text = block.title ?? block.content ?? ''
+
+    const ref = parseIssueRef(text)
+    if (!ref) {
+      logseq.UI.showMsg('No GitHub issue link found in this block.', 'warning')
+      return
+    }
+
+    // Don't double-insert if the widget is already present.
+    if (text.includes(ISSUE_RENDERER_KEY)) {
+      logseq.UI.showMsg('Issue widget already added to this block.', 'info')
+      return
+    }
+
+    const macro = `{{renderer ${ISSUE_RENDERER_KEY}, ${encodeURIComponent(ref.url)}}}`
     await logseq.Editor.updateBlock(block.uuid, `${macro} ${text}`)
   })
 }
