@@ -25,12 +25,12 @@ import {
 
 const main = async () => {
   const isDbGraph = await logseq.App.checkCurrentIsDbGraph()
-  console.log(`git-forge-watcher loaded (DB graph: ${isDbGraph})`)
+  console.log(`github-watcher loaded (DB graph: ${isDbGraph})`)
 
   // Used to handle any popups
   handlePopup()
 
-  // Slash commands: "Git Forge Watcher - Branch" / "… - Issue" / "… - Pull Request"
+  // Slash commands: "GitHub Watcher - Branch" / "… - Issue" / "… - Pull Request"
   registerBranchSlashCommand()
   registerIssueSlashCommand()
   registerPrSlashCommand()
