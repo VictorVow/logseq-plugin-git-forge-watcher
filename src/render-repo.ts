@@ -115,7 +115,7 @@ const countLink = (
 const shell = (inner: string, stale = false): string => `
   <span class="gfw-repo-widget"${stale ? ' title="Offline — showing last known state"' : ''}
         style="display:inline-flex;align-items:center;gap:6px;line-height:1;
-               margin-right:6px;vertical-align:middle;${stale ? 'opacity:0.55;' : ''}">
+               margin-right:6px;vertical-align:baseline;${stale ? 'opacity:0.55;' : ''}">
     ${inner}
   </span>`
 
