@@ -5,18 +5,23 @@ export interface IssueRef {
   url: string
 }
 
-// Pull the first GitHub issue reference out of a block's title/content.
-// Handles `.../issues/<number>` links, ignoring any trailing anchor/query
-// (e.g. `#issuecomment-3902062405`) that Logseq may carry along.
-export const parseIssueRef = (text: string): IssueRef | null => {
-  const re = /https?:\/\/github\.com\/([^/\s)]+)\/([^/\s)]+)\/issues\/(\d+)/i
-  const m = re.exec(text)
-  if (!m) return null
+const ISSUE_RE = /https?:\/\/github\.com\/([^/\s)]+)\/([^/\s)]+)\/issues\/(\d+)/gi
 
-  const [, owner, repo, rawNumber] = m
-  const number = Number(rawNumber)
-  if (!owner || !repo || !number) return null
-
-  const url = `https://github.com/${owner}/${repo}/issues/${number}`
-  return { owner, repo, number, url }
+// Pull every GitHub issue reference out of a block's title/content, in the
+// order they appear. Handles `.../issues/<number>` links, ignoring any trailing
+// anchor/query (e.g. `#issuecomment-3902062405`) that Logseq may carry along.
+export const parseIssueRefs = (text: string): IssueRef[] => {
+  const refs: IssueRef[] = []
+  for (const m of text.matchAll(ISSUE_RE)) {
+    const [, owner, repo, rawNumber] = m
+    const number = Number(rawNumber)
+    if (!owner || !repo || !number) continue
+    const url = `https://github.com/${owner}/${repo}/issues/${number}`
+    refs.push({ owner, repo, number, url })
+  }
+  return refs
 }
+
+// Pull the first GitHub issue reference out of a block's title/content.
+export const parseIssueRef = (text: string): IssueRef | null =>
+  parseIssueRefs(text)[0] ?? null

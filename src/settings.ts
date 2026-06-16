@@ -18,6 +18,14 @@ export const settings: SettingSchemaDesc[] = [
       'A branch whose last commit is older than this many days is shown in yellow (stale) instead of green (active).',
   },
   {
+    key: 'preferLastUrl',
+    type: 'boolean',
+    default: false,
+    title: 'Prefer last URL',
+    description:
+      'When a block contains more than one matching GitHub link, slash commands use the first one by default. Toggle this on to use the last one instead.',
+  },
+  {
     key: 'cacheTtlHours',
     type: 'number',
     default: 24,

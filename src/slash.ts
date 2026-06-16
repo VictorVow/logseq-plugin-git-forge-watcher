@@ -1,11 +1,16 @@
-import { parseBranchRef } from './parse-branch'
-import { parseIssueRef } from './parse-issue'
-import { parsePrRef } from './parse-pr'
-import { parseRepoRef } from './parse-repo'
+import { parseBranchRefs } from './parse-branch'
+import { parseIssueRefs } from './parse-issue'
+import { parsePrRefs } from './parse-pr'
+import { parseRepoRefs } from './parse-repo'
 import { RENDERER_KEY } from './render-branch'
 import { RENDERER_KEY as ISSUE_RENDERER_KEY } from './render-issue'
 import { RENDERER_KEY as PR_RENDERER_KEY } from './render-pr'
 import { RENDERER_KEY as REPO_RENDERER_KEY } from './render-repo'
+
+// When a block contains more than one matching link, slash commands default to
+// the first match. The `preferLastUrl` setting flips this to the last match.
+const pickRef = <T>(refs: T[]): T | undefined =>
+  logseq.settings?.preferLastUrl ? refs.at(-1) : refs[0]
 
 // Registers the "Git Forge Watcher - Branch" slash command. When run on a
 // block, it parses the GitHub branch link out of the block, then prepends a
@@ -20,7 +25,7 @@ export const registerBranchSlashCommand = (): void => {
 
     const text = block.title ?? block.content ?? ''
 
-    const ref = parseBranchRef(text)
+    const ref = pickRef(parseBranchRefs(text))
     if (!ref) {
       logseq.UI.showMsg('No GitHub branch link found in this block.', 'warning')
       return
@@ -47,7 +52,7 @@ export const registerIssueSlashCommand = (): void => {
 
     const text = block.title ?? block.content ?? ''
 
-    const ref = parseIssueRef(text)
+    const ref = pickRef(parseIssueRefs(text))
     if (!ref) {
       logseq.UI.showMsg('No GitHub issue link found in this block.', 'warning')
       return
@@ -76,7 +81,7 @@ export const registerPrSlashCommand = (): void => {
 
       const text = block.title ?? block.content ?? ''
 
-      const ref = parsePrRef(text)
+      const ref = pickRef(parsePrRefs(text))
       if (!ref) {
         logseq.UI.showMsg(
           'No GitHub pull request link found in this block.',
@@ -108,7 +113,7 @@ export const registerRepoSlashCommand = (): void => {
 
     const text = block.title ?? block.content ?? ''
 
-    const ref = parseRepoRef(text)
+    const ref = pickRef(parseRepoRefs(text))
     if (!ref) {
       logseq.UI.showMsg('No GitHub repo link found in this block.', 'warning')
       return
