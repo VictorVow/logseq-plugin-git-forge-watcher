@@ -12,6 +12,14 @@ import { RENDERER_KEY as REPO_RENDERER_KEY } from './render-repo'
 const pickRef = <T>(refs: T[]): T | undefined =>
   logseq.settings?.preferLastUrl ? refs.at(-1) : refs[0]
 
+// Combines the renderer macro with the existing block text. Each command has an
+// `…InsertAtStart` setting (default true) that puts the widget before the text;
+// when it's off the macro is appended at the end instead.
+const placeMacro = (macro: string, text: string, settingKey: string): string =>
+  logseq.settings?.[settingKey] === false
+    ? `${text} ${macro}`
+    : `${macro} ${text}`
+
 // Registers the "Git Forge Watcher - Branch" slash command. When run on a
 // block, it parses the GitHub branch link out of the block, then prepends a
 // renderer macro so the widget renders inline between the bullet and the title.
@@ -38,7 +46,10 @@ export const registerBranchSlashCommand = (): void => {
     }
 
     const macro = `{{renderer ${RENDERER_KEY}, ${encodeURIComponent(ref.url)}}}`
-    await logseq.Editor.updateBlock(block.uuid, `${macro} ${text}`)
+    await logseq.Editor.updateBlock(
+      block.uuid,
+      placeMacro(macro, text, 'branchInsertAtStart'),
+    )
   })
 }
 
@@ -65,7 +76,10 @@ export const registerIssueSlashCommand = (): void => {
     }
 
     const macro = `{{renderer ${ISSUE_RENDERER_KEY}, ${encodeURIComponent(ref.url)}}}`
-    await logseq.Editor.updateBlock(block.uuid, `${macro} ${text}`)
+    await logseq.Editor.updateBlock(
+      block.uuid,
+      placeMacro(macro, text, 'issueInsertAtStart'),
+    )
   })
 }
 
@@ -97,7 +111,10 @@ export const registerPrSlashCommand = (): void => {
       }
 
       const macro = `{{renderer ${PR_RENDERER_KEY}, ${encodeURIComponent(ref.url)}}}`
-      await logseq.Editor.updateBlock(block.uuid, `${macro} ${text}`)
+      await logseq.Editor.updateBlock(
+        block.uuid,
+        placeMacro(macro, text, 'prInsertAtStart'),
+      )
     },
   )
 }
@@ -126,6 +143,9 @@ export const registerRepoSlashCommand = (): void => {
     }
 
     const macro = `{{renderer ${REPO_RENDERER_KEY}, ${encodeURIComponent(ref.url)}}}`
-    await logseq.Editor.updateBlock(block.uuid, `${macro} ${text}`)
+    await logseq.Editor.updateBlock(
+      block.uuid,
+      placeMacro(macro, text, 'repoInsertAtStart'),
+    )
   })
 }

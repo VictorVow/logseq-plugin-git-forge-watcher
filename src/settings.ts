@@ -33,4 +33,36 @@ export const settings: SettingSchemaDesc[] = [
     description:
       'How long branch/PR status is cached before re-querying GitHub. Click a branch icon to force an immediate refresh.',
   },
+  {
+    key: 'branchInsertAtStart',
+    type: 'boolean',
+    default: true,
+    title: 'Branch widget at start of block',
+    description:
+      'Insert the branch renderer at the start of the block (before the text). Toggle off to append it at the end instead.',
+  },
+  {
+    key: 'issueInsertAtStart',
+    type: 'boolean',
+    default: true,
+    title: 'Issue widget at start of block',
+    description:
+      'Insert the issue renderer at the start of the block (before the text). Toggle off to append it at the end instead.',
+  },
+  {
+    key: 'prInsertAtStart',
+    type: 'boolean',
+    default: true,
+    title: 'Pull request widget at start of block',
+    description:
+      'Insert the pull request renderer at the start of the block (before the text). Toggle off to append it at the end instead.',
+  },
+  {
+    key: 'repoInsertAtStart',
+    type: 'boolean',
+    default: true,
+    title: 'Repo widget at start of block',
+    description:
+      'Insert the repo renderer at the start of the block (before the text). Toggle off to append it at the end instead.',
+  },
 ]
