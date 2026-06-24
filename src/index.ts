@@ -29,9 +29,10 @@ import {
   registerRepoSlashCommand,
 } from './slash'
 
-const main = async () => {
-  const isDbGraph = await logseq.App.checkCurrentIsDbGraph()
-  console.log(`git-forge-watcher loaded (DB graph: ${isDbGraph})`)
+const main = () => {
+  // Register everything synchronously so the plugin reports "ready" to Logseq
+  // immediately. Any await here (e.g. a host round-trip) delays ready and makes
+  // Logseq flag the plugin as slow to load, hurting app startup time.
 
   // Used to handle any popups
   handlePopup()
@@ -63,6 +64,13 @@ const main = async () => {
       await handleRepoRender(slot, (encodedUrl ?? '').trim())
     }
   })
+
+  // Non-blocking: log the graph type without delaying ready.
+  logseq.App.checkCurrentIsDbGraph()
+    .then((isDbGraph) =>
+      console.log(`git-forge-watcher loaded (DB graph: ${isDbGraph})`),
+    )
+    .catch(() => {})
 }
 
 logseq.useSettingsSchema(settings).ready(main).catch(console.error)
