@@ -1,4 +1,4 @@
-![Git Forge Watcher icon](./icon.png)
+<img src="./icon.png" alt="Git Forge Watcher icon" width="96" />
 
 # Git Forge Watcher
 
