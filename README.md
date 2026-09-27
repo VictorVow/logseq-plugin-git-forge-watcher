@@ -1,8 +1,12 @@
+![Git Forge Watcher icon](./icon.png)
+
 # Git Forge Watcher
 
 A [Logseq](https://logseq.com) plugin that watches GitHub repos, branches, issues and pull requests, rendering their live status inline inside your blocks.
 
 Run one of its slash commands on a block that contains a GitHub link and it drops a small widget between the bullet and the block's text: a status icon coloured by the current state, plus a link out to GitHub. Click the icon to force a refresh.
+
+![Git Forge Watcher screenshot](./assets/screenshot.png)
 
 ## What it does
 
