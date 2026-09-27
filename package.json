@@ -1,7 +1,7 @@
 {
-  "name": "logseq-plugin-git-forge-watcher",
-  "author": "benjypng",
-  "description": "Watch GitHub branches and their linked pull requests inline in your Logseq blocks.",
+  "name": "logseq-plugin-github-watcher",
+  "author": "victorvow",
+  "description": "View the status of GitHub repos, issues, pull requests from a block.",
   "license": "MIT",
   "logseq": {
     "id": "logseq-plugin-git-forge-watcher",
