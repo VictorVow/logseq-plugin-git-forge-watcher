@@ -1,6 +1,4 @@
-<img src="./icon.png" alt="Git Forge Watcher icon" width="96" />
-
-# Git Forge Watcher
+# Git Forge Watcher <img src="./icon.png" alt="Git Forge Watcher icon" width="96" />
 
 A [Logseq](https://logseq.com) plugin that watches GitHub repos, branches, issues and pull requests, rendering their live status inline inside your blocks.
 
