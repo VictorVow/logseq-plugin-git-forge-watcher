@@ -104,7 +104,18 @@ bun install
 bun run dev
 ```
 
-`bun run dev` starts Vite in dev mode; thanks to [`vite-plugin-logseq`](https://github.com/pengx17/vite-plugin-logseq), edits to `src/` hot-reload inside Logseq without reloading the unpacked plugin.
+`bun run dev` generates a `./dev/` directory (via `scripts/scaffold-dev.mjs`) and starts Vite from inside it. In Logseq, **Load unpacked plugin** and point it at **`./dev/`** (once). Thanks to [`vite-plugin-logseq`](https://github.com/pengx17/vite-plugin-logseq), edits to `src/` hot-reload inside Logseq without reloading the unpacked plugin.
+
+`./dev/` runs under a distinct `logseq-plugin-git-forge-watcher-dev` plugin id with a `(Dev)` title, so it coexists with the marketplace release (Logseq refuses to load two plugins sharing an id). It symlinks `src/` and `index.html` back to the project root, so you keep editing the real sources; `./dev/` itself is git-ignored and regenerated on every `bun run dev`. Because the dev server only writes into `./dev/dist/`, the root `dist/` stays a real build.
+
+Disable the `(Dev)` plugin in Logseq when the dev server isn't running, otherwise it will stall Logseq's startup waiting for `localhost:5173`.
+
+| Command | `./dev/` contains | Use it for |
+| --- | --- | --- |
+| `bun run dev` | Vite dev server + symlinked `src/` | Day-to-day work — **HMR**, edits reflect live, no reload |
+| `bun run build:dev` | the real `bun run build` output (symlinked `dist/`) | Testing the actual production bundle next to the marketplace release |
+
+After a `build:dev` change, re-run it and reload via **Settings → Plugins → ⋯ → Reload** (the static build has no HMR).
 
 ## Project layout
 
@@ -125,6 +136,9 @@ src/
   icons.ts         # GitHub octicon SVGs (branch / PR / issue states)
   settings.ts      # plugin settings schema (token, stale threshold, cache TTL, per-command placement)
   handle-popup.ts  # Esc / click-outside dismiss helpers
+scripts/
+  scaffold-dev.mjs    # generates ./dev/ (-dev id, symlinked src/) for `bun run dev`
+  make-dev-plugin.mjs # generates ./dev/ (-dev id, symlinked dist/) for `bun run build:dev`
 index.html         # Vite entry consumed by Logseq
 vite.config.ts     # registers vite-plugin-logseq
 biome.json         # formatter + linter config

@@ -10,24 +10,21 @@
     "main": "dist/index.html"
   },
   "scripts": {
-    "dev": "bunx vite",
+    "dev": "node scripts/scaffold-dev.mjs && cd dev && bunx vite",
     "build": "bunx vite build",
+    "build:dev": "bun run build && node scripts/make-dev-plugin.mjs",
     "prepare": "husky",
     "lint:precommit": "echo \"Running biome\" && bunx biome check . --write && echo \"Running tsc\" && tsc --noEmit"
   },
   "release": {
-    "branches": [
-      "develop"
-    ],
+    "branches": ["develop"],
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       [
         "@semantic-release/github",
         {
-          "assets": [
-            "logseq-plugin-git-forge-watcher.zip"
-          ]
+          "assets": ["logseq-plugin-git-forge-watcher.zip"]
         }
       ]
     ]
