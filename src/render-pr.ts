@@ -1,16 +1,5 @@
-import {
-  cacheKey,
-  dedupe,
-  getCached,
-  getCachedStale,
-  setCached,
-} from './cache'
-import {
-  GitHubError,
-  type PrInfo,
-  type PrState,
-  fetchPrResult,
-} from './github'
+import { cacheKey, dedupe, getCached, getCachedStale, setCached } from './cache'
+import { fetchPrResult, GitHubError, type PrInfo, type PrState } from './github'
 import {
   closedIconSvg,
   linkExternalIconSvg,
@@ -45,11 +34,7 @@ const PR_LABEL: Record<PrState, string> = {
 // The PR icon is a button that force-refreshes the cache on click. The slot +
 // encoded url ride along in data attributes so the click model can re-render
 // this exact widget.
-const prButton = (
-  state: PrState,
-  slot: string,
-  encodedUrl: string,
-): string => `
+const prButton = (state: PrState, slot: string, encodedUrl: string): string => `
   <span class="gfw-pr-btn" data-on-click="gfwRefreshPr"
         data-slot="${slot}" data-url="${encodedUrl}"
         title="Pull request ${PR_LABEL[state]} — click to refresh"

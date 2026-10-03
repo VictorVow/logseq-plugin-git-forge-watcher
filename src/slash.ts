@@ -106,7 +106,10 @@ export const registerPrSlashCommand = (): void => {
 
       // Don't double-insert if the widget is already present.
       if (text.includes(PR_RENDERER_KEY)) {
-        logseq.UI.showMsg('Pull request widget already added to this block.', 'info')
+        logseq.UI.showMsg(
+          'Pull request widget already added to this block.',
+          'info',
+        )
         return
       }
 

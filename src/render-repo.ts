@@ -1,11 +1,5 @@
-import {
-  cacheKey,
-  dedupe,
-  getCached,
-  getCachedStale,
-  setCached,
-} from './cache'
-import { GitHubError, type RepoResult, fetchRepoResult } from './github'
+import { cacheKey, dedupe, getCached, getCachedStale, setCached } from './cache'
+import { fetchRepoResult, GitHubError, type RepoResult } from './github'
 import {
   issueOpenedIconSvg,
   linkExternalIconSvg,
@@ -19,7 +13,7 @@ export const RENDERER_KEY = ':gfw-repo'
 // Compact counts the way GitHub renders them: 103k, 1.2k, 12.3k, 2.1m.
 const compact = (n: number): string => {
   if (n < 1000) return String(n)
-  const units: Array<[number, string]> = [
+  const units: [number, string][] = [
     [1e6, 'm'],
     [1e3, 'k'],
   ]
@@ -39,7 +33,7 @@ const relativeTime = (iso?: string): string => {
   const then = new Date(iso).getTime()
   if (Number.isNaN(then)) return 'unknown'
   const secs = Math.max(0, (Date.now() - then) / 1000)
-  const units: Array<[number, string]> = [
+  const units: [number, string][] = [
     [31536000, 'year'],
     [2592000, 'month'],
     [604800, 'week'],

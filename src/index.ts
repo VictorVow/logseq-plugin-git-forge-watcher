@@ -70,7 +70,7 @@ const main = () => {
     .then((isDbGraph) =>
       console.log(`git-forge-watcher loaded (DB graph: ${isDbGraph})`),
     )
-    .catch(() => {})
+    .catch(console.error)
 }
 
 logseq.useSettingsSchema(settings).ready(main).catch(console.error)

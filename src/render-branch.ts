@@ -1,10 +1,4 @@
-import {
-  cacheKey,
-  dedupe,
-  getCached,
-  getCachedStale,
-  setCached,
-} from './cache'
+import { cacheKey, dedupe, getCached, getCachedStale, setCached } from './cache'
 import {
   type BranchResult,
   type BranchStatus,
@@ -166,7 +160,7 @@ export const handleRender = async (
   // Serve from cache unless this is a forced refresh.
   const ck = cacheKey(ref.owner, ref.repo, ref.branch)
   if (!force) {
-    const cached = getCached(ck, ttlMs())
+    const cached = getCached<BranchResult>(ck, ttlMs())
     if (cached) {
       draw(cached)
       return

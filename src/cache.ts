@@ -66,10 +66,7 @@ export const clearCached = (key: string): void => {
 
 // Run `fn` unless an identical fetch is already in flight, in which case share
 // its promise.
-export const dedupe = <T>(
-  key: string,
-  fn: () => Promise<T>,
-): Promise<T> => {
+export const dedupe = <T>(key: string, fn: () => Promise<T>): Promise<T> => {
   const existing = inflight.get(key) as Promise<T> | undefined
   if (existing) return existing
   const p = fn().finally(() => inflight.delete(key))

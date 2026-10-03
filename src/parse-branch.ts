@@ -16,11 +16,12 @@ export const parseBranchRefs = (text: string): BranchRef[] => {
   const refs: BranchRef[] = []
   for (const m of text.matchAll(BRANCH_RE)) {
     const [url, owner, repo, rawBranch] = m
+    if (!owner || !repo || !rawBranch) continue
     // Strip a trailing slash and any anchor/query.
     const branch = decodeURIComponent(
       rawBranch.replace(/[#?].*$/, '').replace(/\/+$/, ''),
     )
-    if (!owner || !repo || !branch) continue
+    if (!branch) continue
     refs.push({ owner, repo, branch, url })
   }
   return refs

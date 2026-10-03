@@ -15,8 +15,9 @@ export const parseRepoRefs = (text: string): RepoRef[] => {
   const refs: RepoRef[] = []
   for (const m of text.matchAll(REPO_RE)) {
     const [, owner, rawRepo] = m
+    if (!owner || !rawRepo) continue
     const repo = rawRepo.replace(/\.git$/i, '')
-    if (!owner || !repo) continue
+    if (!repo) continue
     const url = `https://github.com/${owner}/${repo}`
     refs.push({ owner, repo, url })
   }

@@ -1,15 +1,9 @@
+import { cacheKey, dedupe, getCached, getCachedStale, setCached } from './cache'
 import {
-  cacheKey,
-  dedupe,
-  getCached,
-  getCachedStale,
-  setCached,
-} from './cache'
-import {
+  fetchIssueResult,
   GitHubError,
   type IssueResult,
   type IssueState,
-  fetchIssueResult,
 } from './github'
 import {
   issueClosedIconSvg,

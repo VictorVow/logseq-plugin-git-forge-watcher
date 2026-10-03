@@ -5,7 +5,8 @@ export interface IssueRef {
   url: string
 }
 
-const ISSUE_RE = /https?:\/\/github\.com\/([^/\s)]+)\/([^/\s)]+)\/issues\/(\d+)/gi
+const ISSUE_RE =
+  /https?:\/\/github\.com\/([^/\s)]+)\/([^/\s)]+)\/issues\/(\d+)/gi
 
 // Pull every GitHub issue reference out of a block's title/content, in the
 // order they appear. Handles `.../issues/<number>` links, ignoring any trailing
