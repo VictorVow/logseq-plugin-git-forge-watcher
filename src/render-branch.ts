@@ -157,8 +157,9 @@ export const handleRender = async (
     })
   }
 
-  // Serve from cache unless this is a forced refresh.
-  const ck = cacheKey(ref.owner, ref.repo, ref.branch)
+  // Serve from cache unless this is a forced refresh. The `branch/` prefix keeps
+  // branches named e.g. `repo` or `pull/5` from colliding with other widgets.
+  const ck = cacheKey(ref.owner, ref.repo, `branch/${ref.branch}`)
   if (!force) {
     const cached = getCached<BranchResult>(ck, ttlMs())
     if (cached) {
