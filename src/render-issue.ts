@@ -13,6 +13,7 @@ import {
 } from './icons'
 import { parseIssueRef } from './parse-issue'
 
+// Macro key inserted by older versions; still rendered (see `render.ts`).
 export const RENDERER_KEY = ':gfw-issue'
 
 const ISSUE_COLORS: Record<IssueState, string> = {

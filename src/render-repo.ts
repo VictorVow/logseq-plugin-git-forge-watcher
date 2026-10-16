@@ -8,6 +8,7 @@ import {
 } from './icons'
 import { parseRepoRef } from './parse-repo'
 
+// Macro key inserted by older versions; still rendered (see `render.ts`).
 export const RENDERER_KEY = ':gfw-repo'
 
 // Compact counts the way GitHub renders them: 103k, 1.2k, 12.3k, 2.1m.

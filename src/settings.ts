@@ -39,7 +39,7 @@ export const settings: SettingSchemaDesc[] = [
     default: true,
     title: 'Branch widget at start of block',
     description:
-      'Insert the branch renderer at the start of the block (before the text). Toggle off to append it at the end instead.',
+      'When the slash command adds a branch widget, insert it at the start of the block (before the text). Toggle off to append it at the end instead.',
   },
   {
     key: 'issueInsertAtStart',
@@ -47,7 +47,7 @@ export const settings: SettingSchemaDesc[] = [
     default: true,
     title: 'Issue widget at start of block',
     description:
-      'Insert the issue renderer at the start of the block (before the text). Toggle off to append it at the end instead.',
+      'When the slash command adds an issue widget, insert it at the start of the block (before the text). Toggle off to append it at the end instead.',
   },
   {
     key: 'prInsertAtStart',
@@ -55,7 +55,7 @@ export const settings: SettingSchemaDesc[] = [
     default: true,
     title: 'Pull request widget at start of block',
     description:
-      'Insert the pull request renderer at the start of the block (before the text). Toggle off to append it at the end instead.',
+      'When the slash command adds a pull request widget, insert it at the start of the block (before the text). Toggle off to append it at the end instead.',
   },
   {
     key: 'repoInsertAtStart',
@@ -63,6 +63,6 @@ export const settings: SettingSchemaDesc[] = [
     default: true,
     title: 'Repo widget at start of block',
     description:
-      'Insert the repo renderer at the start of the block (before the text). Toggle off to append it at the end instead.',
+      'When a slash command adds a repo widget, insert it at the start of the block (before the text). Toggle off to append it at the end instead.',
   },
 ]

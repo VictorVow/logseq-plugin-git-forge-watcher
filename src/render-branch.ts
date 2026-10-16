@@ -16,6 +16,7 @@ import {
 } from './icons'
 import { parseBranchRef } from './parse-branch'
 
+// Macro key inserted by older versions; still rendered (see `render.ts`).
 export const RENDERER_KEY = ':gfw-branch'
 
 const BRANCH_COLORS: Record<BranchStatus, string> = {

@@ -3,12 +3,7 @@ import '@logseq/libs'
 import { handlePopup } from './handle-popup'
 import { handleRender, registerRenderModels } from './render'
 import { settings } from './settings'
-import {
-  registerBranchSlashCommand,
-  registerIssueSlashCommand,
-  registerPrSlashCommand,
-  registerRepoSlashCommand,
-} from './slash'
+import { registerSlashCommands } from './slash'
 
 const main = () => {
   // Register everything synchronously so the plugin reports "ready" to Logseq
@@ -18,12 +13,8 @@ const main = () => {
   // Used to handle any popups
   handlePopup()
 
-  // Slash commands: "Git Forge Watcher - Branch" / "… - Issue" /
-  // "… - Pull Request" / "… - Repo"
-  registerBranchSlashCommand()
-  registerIssueSlashCommand()
-  registerPrSlashCommand()
-  registerRepoSlashCommand()
+  // Slash commands: "Git Forge Watcher" / "Git Forge Watcher - Repo"
+  registerSlashCommands()
 
   // Click handlers backing the button force-refresh on each widget.
   registerRenderModels()

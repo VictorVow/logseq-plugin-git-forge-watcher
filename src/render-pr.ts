@@ -8,6 +8,7 @@ import {
 } from './icons'
 import { parsePrRef } from './parse-pr'
 
+// Macro key inserted by older versions; still rendered (see `render.ts`).
 export const RENDERER_KEY = ':gfw-pr'
 
 const PR_COLORS: Record<PrState, string> = {
