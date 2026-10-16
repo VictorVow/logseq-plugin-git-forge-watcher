@@ -1,26 +1,7 @@
 import '@logseq/libs'
 
 import { handlePopup } from './handle-popup'
-import {
-  handleRender,
-  RENDERER_KEY,
-  registerBranchRenderModel,
-} from './render-branch'
-import {
-  handleRender as handleIssueRender,
-  RENDERER_KEY as ISSUE_RENDERER_KEY,
-  registerIssueRenderModel,
-} from './render-issue'
-import {
-  handleRender as handlePrRender,
-  RENDERER_KEY as PR_RENDERER_KEY,
-  registerPrRenderModel,
-} from './render-pr'
-import {
-  handleRender as handleRepoRender,
-  RENDERER_KEY as REPO_RENDERER_KEY,
-  registerRepoRenderModel,
-} from './render-repo'
+import { handleRender, registerRenderModels } from './render'
 import { settings } from './settings'
 import {
   registerBranchSlashCommand,
@@ -45,25 +26,13 @@ const main = () => {
   registerRepoSlashCommand()
 
   // Click handlers backing the button force-refresh on each widget.
-  registerBranchRenderModel()
-  registerIssueRenderModel()
-  registerPrRenderModel()
-  registerRepoRenderModel()
+  registerRenderModels()
 
-  // Renderers that draw the inline widgets inside the block.
-  logseq.App.onMacroRendererSlotted(async ({ slot, payload }) => {
-    const [name, encodedUrl] = payload.arguments
-    const key = name?.trim()
-    if (key === RENDERER_KEY) {
-      await handleRender(slot, (encodedUrl ?? '').trim())
-    } else if (key === ISSUE_RENDERER_KEY) {
-      await handleIssueRender(slot, (encodedUrl ?? '').trim())
-    } else if (key === PR_RENDERER_KEY) {
-      await handlePrRender(slot, (encodedUrl ?? '').trim())
-    } else if (key === REPO_RENDERER_KEY) {
-      await handleRepoRender(slot, (encodedUrl ?? '').trim())
-    }
-  })
+  // Renderer that draws the inline widgets inside the block. Handles the
+  // unified `:gfw` key plus the legacy per-kind keys.
+  logseq.App.onMacroRendererSlotted(({ slot, payload }) =>
+    handleRender(slot, payload.arguments),
+  )
 
   // Non-blocking: log the graph type without delaying ready.
   logseq.App.checkCurrentIsDbGraph()
