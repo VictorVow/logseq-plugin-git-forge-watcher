@@ -13,6 +13,16 @@ export interface LinkRef {
   url: string
 }
 
+// Macro arguments carry the URL percent-encoded (so commas can't split it).
+// Fall back to the raw string if it isn't valid encoding.
+export const decodeUrl = (encodedUrl: string): string => {
+  try {
+    return decodeURIComponent(encodedUrl)
+  } catch {
+    return encodedUrl
+  }
+}
+
 // Most specific first. Every GitHub link has an owner/repo, so `repo` is the
 // fallback for anything that isn't a branch, issue or pull request link.
 const MATCHERS: [LinkKind, (url: string) => { url: string } | null][] = [

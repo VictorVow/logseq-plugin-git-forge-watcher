@@ -137,6 +137,7 @@ src/
   index.ts         # plugin entry: registers the slash commands + macro renderer
   slash.ts         # the "Git Forge Watcher" and "Git Forge Watcher - Repo" slash commands
   render.ts        # `:gfw` (+ legacy `:gfw-*`) macro dispatch to the per-kind widgets
+  widget.ts        # shared widget pipeline: cache, fetch, offline fallback, errors, refresh button
   render-repo.ts   # builds the inline repo widget (stars, last commit, issue/PR counts)
   render-branch.ts # builds the inline branch widget (status + PR pills)
   render-issue.ts  # builds the inline issue widget

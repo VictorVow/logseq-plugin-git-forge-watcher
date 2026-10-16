@@ -1,24 +1,14 @@
-import { classifyLink, isLinkKind, type LinkKind } from './parse-link'
 import {
-  RENDERER_KEY as BRANCH_RENDERER_KEY,
-  registerBranchRenderModel,
-  handleRender as renderBranch,
-} from './render-branch'
-import {
-  RENDERER_KEY as ISSUE_RENDERER_KEY,
-  registerIssueRenderModel,
-  handleRender as renderIssue,
-} from './render-issue'
-import {
-  RENDERER_KEY as PR_RENDERER_KEY,
-  registerPrRenderModel,
-  handleRender as renderPr,
-} from './render-pr'
-import {
-  RENDERER_KEY as REPO_RENDERER_KEY,
-  registerRepoRenderModel,
-  handleRender as renderRepo,
-} from './render-repo'
+  classifyLink,
+  decodeUrl,
+  isLinkKind,
+  type LinkKind,
+} from './parse-link'
+import { handleRender as renderBranch } from './render-branch'
+import { handleRender as renderIssue } from './render-issue'
+import { handleRender as renderPr } from './render-pr'
+import { handleRender as renderRepo } from './render-repo'
+import type { Renderer } from './widget'
 
 // `{{renderer :gfw, <encoded-url>}}` picks the widget from the URL's shape. An
 // optional third argument forces a kind, e.g. `{{renderer :gfw, <url>, repo}}`
@@ -28,16 +18,13 @@ export const RENDERER_KEY = ':gfw'
 // Macros inserted by older versions name the widget kind in the key itself.
 // They're stored in users' graphs, so they must keep rendering as that kind.
 const LEGACY_KEYS: Record<string, LinkKind> = {
-  [BRANCH_RENDERER_KEY]: 'branch',
-  [ISSUE_RENDERER_KEY]: 'issue',
-  [PR_RENDERER_KEY]: 'pr',
-  [REPO_RENDERER_KEY]: 'repo',
+  ':gfw-branch': 'branch',
+  ':gfw-issue': 'issue',
+  ':gfw-pr': 'pr',
+  ':gfw-repo': 'repo',
 }
 
-const RENDERERS: Record<
-  LinkKind,
-  (slot: string, encodedUrl: string) => Promise<void>
-> = {
+const RENDERERS: Record<LinkKind, Renderer> = {
   branch: renderBranch,
   issue: renderIssue,
   pr: renderPr,
@@ -46,14 +33,6 @@ const RENDERERS: Record<
 
 export const isWidgetKey = (key: string): boolean =>
   key === RENDERER_KEY || key in LEGACY_KEYS
-
-const decode = (encodedUrl: string): string => {
-  try {
-    return decodeURIComponent(encodedUrl)
-  } catch {
-    return encodedUrl
-  }
-}
 
 type Resolved = { kind: LinkKind } | { error: string }
 
@@ -72,16 +51,22 @@ export const resolveKind = (
       ? { kind: forced }
       : { error: `unknown widget type "${forced}"` }
   }
-  const ref = classifyLink(decode(encodedUrl))
+  const ref = classifyLink(decodeUrl(encodedUrl))
   return ref ? { kind: ref.kind } : { error: 'no GitHub link' }
 }
 
-// Register the click handlers that back each widget's force-refresh button.
+// Register the click handler behind every widget's force-refresh button. The
+// button carries its widget kind, slot and URL (see `refreshAttrs`).
 export const registerRenderModels = (): void => {
-  registerBranchRenderModel()
-  registerIssueRenderModel()
-  registerPrRenderModel()
-  registerRepoRenderModel()
+  logseq.provideModel({
+    async gfwRefresh(e: {
+      dataset: { kind?: string; slot?: string; url?: string }
+    }) {
+      const { kind, slot, url } = e.dataset
+      if (isLinkKind(kind) && slot && url)
+        await RENDERERS[kind](slot, url, true)
+    },
+  })
 }
 
 export const handleRender = async (

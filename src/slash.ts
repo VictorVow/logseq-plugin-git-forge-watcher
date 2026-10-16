@@ -1,4 +1,4 @@
-import { type LinkRef, parseLinkRefs } from './parse-link'
+import { decodeUrl, type LinkRef, parseLinkRefs } from './parse-link'
 import { parseRepoRefs } from './parse-repo'
 import { RENDERER_KEY, resolveKind } from './render'
 
@@ -30,11 +30,8 @@ const existingWidgets = (text: string): Set<string> => {
   for (const [, key, encodedUrl, kindArg] of text.matchAll(MACRO_RE)) {
     if (!key || !encodedUrl) continue
     const resolved = resolveKind(key, encodedUrl, kindArg)
-    if (!('kind' in resolved)) continue
-    try {
-      ids.add(widgetId(resolved.kind, decodeURIComponent(encodedUrl)))
-    } catch {
-      ids.add(widgetId(resolved.kind, encodedUrl))
+    if ('kind' in resolved) {
+      ids.add(widgetId(resolved.kind, decodeUrl(encodedUrl)))
     }
   }
   return ids
