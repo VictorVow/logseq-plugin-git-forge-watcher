@@ -2,24 +2,33 @@
 
 A [Logseq](https://logseq.com) plugin that watches GitHub repos, branches, issues and pull requests, rendering their live status inline inside your blocks.
 
-Run one of its slash commands on a block that contains a GitHub link and it drops a small widget between the bullet and the block's text: a status icon coloured by the current state, plus a link out to GitHub. Click the icon to force a refresh.
+Run its slash command on a block that contains a GitHub link and it drops a small widget between the bullet and the block's text: a status icon coloured by the current state, plus a link out to GitHub. Click the icon to force a refresh.
 
 ![Git Forge Watcher screenshot](./assets/screenshot.png)
 
 ## What it does
 
-The plugin adds four slash commands, one per kind of GitHub link. Each one reads the link out of the block, prepends a renderer macro, and draws an inline widget at the start of the block (or the end, if you flip its "insert at start" setting off).
+The **Git Forge Watcher** slash command reads the GitHub link out of the block, prepends a renderer macro, and draws an inline widget at the start of the block (or the end, if you flip that widget kind's "insert at start" setting off). The widget is chosen from the shape of the link:
 
-### Git Forge Watcher - Repo
+| Link | Widget |
+| --- | --- |
+| `github.com/<owner>/<repo>/pull/<number>` | [Pull request](#pull-request) |
+| `github.com/<owner>/<repo>/issues/<number>` | [Issue](#issue) |
+| `github.com/<owner>/<repo>/tree/<branch>` | [Branch](#branch) |
+| any other `github.com/<owner>/<repo>…` link | [Repo](#repo) |
 
-For a block containing any `github.com/<owner>/<repo>` link (any deeper link — `.../tree/x`, `.../pull/1`, `.../issues/2` — resolves to its repo root), it renders a card with:
+To get the repo widget for a deeper link (e.g. repo stats for a block that only links a pull request), use **Git Forge Watcher - Repo** instead: it resolves any GitHub link to its repository root.
+
+### Repo
+
+For a `github.com/<owner>/<repo>` link (or any deeper link, via **Git Forge Watcher - Repo**), it renders a card with:
 
 - ⭐ **star count**, compacted the way GitHub does (`1.2k`, `12.3k`, `2.1m`)
 - a link out to the repository
 - the **last commit's** relative age, linking to the default branch's commit history
 - **open issue** and **open pull request** counts, each linking to the matching tab
 
-### Git Forge Watcher - Branch
+### Branch
 
 For a block containing a `github.com/<owner>/<repo>/tree/<branch>` link, e.g.
 
@@ -36,7 +45,7 @@ it renders:
 - **Pull-request pills** for every PR opened from that branch, each showing the PR number and an icon coloured by state:
   - 🟢 green — open · ⚪ grey — draft · 🔴 red — closed · 🟣 purple — merged
 
-### Git Forge Watcher - Issue
+### Issue
 
 For a block containing a `github.com/<owner>/<repo>/issues/<number>` link (any trailing `#issuecomment-…` anchor is ignored), it renders an **issue button** coloured by state, plus a link out to the issue:
 
@@ -44,7 +53,7 @@ For a block containing a `github.com/<owner>/<repo>/issues/<number>` link (any t
 - 🟣 **purple** — closed as completed
 - ⚪ **grey** — closed as not planned
 
-### Git Forge Watcher - Pull Request
+### Pull request
 
 For a block containing a `github.com/<owner>/<repo>/pull/<number>` link, it renders a **pull-request button** coloured by state, plus a link out to the PR:
 
@@ -57,10 +66,14 @@ Status is read live from the GitHub REST API. Every widget's status icon (or, fo
 
 ## Usage
 
-1. Put your cursor in a block that contains the relevant GitHub link.
-2. Type `/` and choose the matching command — **Git Forge Watcher - Repo**, **- Branch**, **- Issue**, or **- Pull Request**.
+1. Put your cursor in a block that contains a GitHub link.
+2. Type `/` and choose **Git Forge Watcher** (or **Git Forge Watcher - Repo** for the repo widget).
 
-The command prepends a `{{renderer :gfw-repo, …}}` (or `:gfw-branch` / `:gfw-issue` / `:gfw-pr`) macro to the block, which renders the widget inline. Works on both DB graphs (reads `block/title`) and legacy file graphs (reads `block/content`).
+The command prepends a `{{renderer :gfw, <encoded-url>}}` macro to the block, which renders the widget inline. If the block has several GitHub links, run the command again to add a widget for the next one. Works on both DB graphs (reads `block/title`) and legacy file graphs (reads `block/content`).
+
+You can also force the widget kind by hand with a third argument — `repo`, `branch`, `issue` or `pr` — e.g. `{{renderer :gfw, <encoded-url>, repo}}`.
+
+Blocks created by older versions use the `:gfw-repo`, `:gfw-branch`, `:gfw-issue` and `:gfw-pr` macros. These keep working unchanged, always rendering as their named kind.
 
 ## Caching & offline behaviour
 
@@ -79,10 +92,10 @@ Status is cached in the plugin's `localStorage`, so it persists across restarts 
 | **Stale threshold (days)** | `30` | A branch whose last commit is older than this many days shows yellow (stale) instead of green (active). |
 | **Prefer last URL** | `false` | When a block contains more than one matching GitHub link, slash commands use the first one by default; enable this to use the last one instead. |
 | **Cache TTL (hours)** | `24` | How long repo/branch/issue/PR status is cached before re-querying GitHub. Click a status icon to force an immediate refresh. |
-| **Repo widget at start of block** | `true` | Insert the repo renderer at the start of the block. Turn off to append it at the end instead. |
-| **Branch widget at start of block** | `true` | Insert the branch renderer at the start of the block. Turn off to append it at the end instead. |
-| **Issue widget at start of block** | `true` | Insert the issue renderer at the start of the block. Turn off to append it at the end instead. |
-| **Pull request widget at start of block** | `true` | Insert the pull request renderer at the start of the block. Turn off to append it at the end instead. |
+| **Repo widget at start of block** | `true` | When a slash command adds a repo widget, insert it at the start of the block. Turn off to append it at the end instead. |
+| **Branch widget at start of block** | `true` | When the slash command adds a branch widget, insert it at the start of the block. Turn off to append it at the end instead. |
+| **Issue widget at start of block** | `true` | When the slash command adds an issue widget, insert it at the start of the block. Turn off to append it at the end instead. |
+| **Pull request widget at start of block** | `true` | When the slash command adds a pull request widget, insert it at the start of the block. Turn off to append it at the end instead. |
 
 Without a token the plugin uses GitHub's unauthenticated rate limit (60 requests/hour per IP), which is fine for light use but may throttle on large graphs.
 
@@ -121,13 +134,15 @@ After a `build:dev` change, re-run it and reload via **Settings → Plugins → 
 
 ```
 src/
-  index.ts         # plugin entry: registers the slash commands + macro renderers
-  slash.ts         # the four "Git Forge Watcher - …" slash commands
+  index.ts         # plugin entry: registers the slash commands + macro renderer
+  slash.ts         # the "Git Forge Watcher" and "Git Forge Watcher - Repo" slash commands
+  render.ts        # `:gfw` (+ legacy `:gfw-*`) macro dispatch to the per-kind widgets
   render-repo.ts   # builds the inline repo widget (stars, last commit, issue/PR counts)
   render-branch.ts # builds the inline branch widget (status + PR pills)
   render-issue.ts  # builds the inline issue widget
   render-pr.ts     # builds the inline pull-request widget
   github.ts        # GitHub REST client: repo facts, branch status, PRs, issue/PR state
+  parse-link.ts    # classifies a GitHub link as a repo/branch/issue/PR widget
   parse-repo.ts    # extracts owner/repo from any GitHub link
   parse-branch.ts  # extracts owner/repo/branch from a tree link
   parse-issue.ts   # extracts owner/repo/number from an issues link
