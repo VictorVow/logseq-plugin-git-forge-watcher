@@ -31,7 +31,7 @@ export const settings: SettingSchemaDesc[] = [
     default: 24,
     title: 'Cache TTL (hours)',
     description:
-      'How long branch/PR status is cached before re-querying GitHub. Click a branch icon to force an immediate refresh.',
+      'How long widget data (branches, PRs, issues and repos) is cached before re-querying GitHub. Click a branch icon or a repo star count to force an immediate refresh.',
   },
   {
     key: 'branchInsertAtStart',
