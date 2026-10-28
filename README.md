@@ -8,7 +8,7 @@ Run its slash command on a block that contains a GitHub link and it drops a smal
 
 ## What it does
 
-The **Git Forge Watcher** slash command reads the GitHub link out of the block, prepends a renderer macro, and draws an inline widget at the start of the block (or the end, if you flip that widget kind's "insert at start" setting off). The widget is chosen from the shape of the link:
+The **Git Forge Watcher** slash command reads the GitHub link out of the block, prepends a renderer macro, and draws an inline widget in the block (at the start of the text by default, or wherever that widget kind's placement setting puts it). The widget is chosen from the shape of the link:
 
 | Link | Widget |
 | --- | --- |
@@ -92,10 +92,10 @@ Status is cached in the plugin's `localStorage`, so it persists across restarts 
 | **Stale threshold (days)** | `30` | A branch whose last commit is older than this many days shows yellow (stale) instead of green (active). |
 | **Prefer last URL** | `false` | When a block contains more than one matching GitHub link, slash commands use the first one by default; enable this to use the last one instead. |
 | **Cache TTL (hours)** | `24` | How long repo/branch/issue/PR status is cached before re-querying GitHub. Click a status icon to force an immediate refresh. |
-| **Repo widget at start of block** | `true` | When a slash command adds a repo widget, insert it at the start of the block. Turn off to append it at the end instead. |
-| **Branch widget at start of block** | `true` | When the slash command adds a branch widget, insert it at the start of the block. Turn off to append it at the end instead. |
-| **Issue widget at start of block** | `true` | When the slash command adds an issue widget, insert it at the start of the block. Turn off to append it at the end instead. |
-| **Pull request widget at start of block** | `true` | When the slash command adds a pull request widget, insert it at the start of the block. Turn off to append it at the end instead. |
+| **Repo widget placement** | `start` | Where a slash command puts a repo widget: `start` or `end` of the existing text, or `newLineBefore` / `newLineAfter` for its own line. |
+| **Branch widget placement** | `start` | Where the slash command puts a branch widget, same options as above. |
+| **Issue widget placement** | `start` | Where the slash command puts an issue widget, same options as above. |
+| **Pull request widget placement** | `start` | Where the slash command puts a pull request widget, same options as above. |
 
 Without a token the plugin uses GitHub's unauthenticated rate limit (60 requests/hour per IP), which is fine for light use but may throttle on large graphs.
 

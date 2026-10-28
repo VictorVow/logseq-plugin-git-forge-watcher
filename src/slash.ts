@@ -8,12 +8,20 @@ const pickRef = <T>(refs: T[]): T | undefined =>
   logseq.settings?.preferLastUrl ? refs.at(-1) : refs[0]
 
 // Combines the renderer macro with the existing block text. Each widget kind
-// has an `…InsertAtStart` setting (default true) that puts the widget before
-// the text; when it's off the macro is appended at the end instead.
-const placeMacro = (macro: string, text: string, settingKey: string): string =>
-  logseq.settings?.[settingKey] === false
-    ? `${text} ${macro}`
-    : `${macro} ${text}`
+// has an `…Placement` setting: `start` / `end` (same line, before / after the
+// text) or `newLineBefore` / `newLineAfter` (own line).
+const placeMacro = (macro: string, text: string, kind: string): string => {
+  switch (logseq.settings?.[`${kind}Placement`]) {
+    case 'end':
+      return `${text} ${macro}`
+    case 'newLineBefore':
+      return `${macro}\n${text}`
+    case 'newLineAfter':
+      return `${text}\n${macro}`
+    default:
+      return `${macro} ${text}`
+  }
+}
 
 // Matches any of this plugin's renderer macros, current or legacy:
 // `{{renderer :gfw, <url>}}`, `{{renderer :gfw, <url>, repo}}`,
@@ -69,7 +77,7 @@ const insertWidget = async (
   const macro = `{{renderer ${RENDERER_KEY}, ${encodeURIComponent(ref.url)}}}`
   await logseq.Editor.updateBlock(
     block.uuid,
-    placeMacro(macro, text, `${ref.kind}InsertAtStart`),
+    placeMacro(macro, text, ref.kind),
   )
 }
 
